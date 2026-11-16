@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Omni Athletics | Client Portal</title>
+<meta name="description" content="Your Omni Athletics portal. Your plan, your progress, your sessions and messages with your coach.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Omni">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/assets/icon-192.png">
+<meta property="og:title" content="Omni Athletics Client Portal">
+<meta property="og:image" content="https://omniathletics.co/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/omni-app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<div class="demo-bar" id="demoBar" hidden>Demo with sample data. Nothing here is saved. <a href="/portal/">Create your real account</a></div>
+
+<!-- sign in / create account -->
+<section class="auth" id="auth" hidden>
+  <div class="box">
+    <div class="logo"><img src="/assets/logo.png" alt="Omni Athletics"><p class="eyebrow">Omni Athletics · Client portal</p><h1 class="disp" style="font-size:54px">Your training<span class="dot">.</span><br>Your results<span class="dot">.</span></h1></div>
+    <div class="card">
+      <div class="seg" role="group" aria-label="Sign in or create account" style="width:100%;margin-bottom:16px"><button type="button" data-mode="in" aria-pressed="true" style="flex:1">Sign in</button><button type="button" data-mode="up" aria-pressed="false" style="flex:1">Create account</button></div>
+      <form id="authForm" class="grid" novalidate>
+        <div class="field" data-up hidden><label for="aName">Full name</label><input id="aName" autocomplete="name"></div>
+        <div class="field"><label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="aPw">Password</label><input id="aPw" type="password" autocomplete="current-password" minlength="8" required></div>
+        <div class="field" data-up hidden><label for="aPath">I'm here for</label><select id="aPath"><option value="health">Omni Health · adults</option><option value="performance">Omni Performance · athletes</option></select></div>
+        <div class="field" data-up hidden><label for="aGoal">My main goal</label><input id="aGoal" placeholder="Lose 20 lbs, get stronger, make varsity..."></div>
+        <p class="err" id="aErr" role="alert"></p>
+        <button class="btn" type="submit" id="aBtn">Sign in</button>
+      </form>
+      <p class="small muted" style="margin:14px 0 0;text-align:center">Just looking? <a href="?demo=1">See the portal with sample data</a></p>
+    </div>
+    <p class="foot"><a href="/">Back to omniathletics.co</a></p>
+  </div>
+</section>
+
+<!-- app -->
+<div id="app" hidden>
+  <header class="top"><div class="wrap">
+    <a class="brand" href="/"><img src="/assets/logo.png" alt=""><b>OMNI</b><small>Client portal</small></a>
+    <span class="sp"></span>
+    <nav class="tabs desk" aria-label="Portal"><button data-tab="home">Home</button><button data-tab="progress">Progress</button><button data-tab="training">Training</button><button data-tab="messages">Coach</button><button data-tab="payments">Payments</button></nav>
+    <button class="iconbtn" id="meBtn" aria-label="Your account"><span id="meInit" style="font-family:var(--disp);font-size:20px;padding-top:3px">?</span></button>
+  </div></header>
+  <main><div class="wrap">
+    <!-- HOME -->
+    <section class="sec" data-view="home">
+      <div class="mon" style="container-type:inline-size"><i></i>
+        <div class="hud" aria-hidden="true"><b data-rec>REC 00:00:00:00</b><span><span class="city">Bellingham </span><span data-clock></span></span></div>
+        <p class="eyebrow" id="hPlan">Your plan</p>
+        <h1 class="disp" style="font-size:clamp(52px,11vw,96px);margin-top:6px" id="hHello">Welcome<span class="dot">.</span></h1>
+        <p class="muted" id="hGoal" style="margin:8px 0 18px;max-width:34em"></p>
+        <div class="row"><button class="btn" data-go="progress" data-open-checkin>Weekly check in</button><button class="btn g" data-go="training">This week's training</button></div>
+      </div>
+      <div class="grid g4">
+        <div class="card stat"><p class="eyebrow">Current weight</p><div class="n" id="sW">--</div><div id="sWc"></div></div>
+        <div class="card stat"><p class="eyebrow">This week</p><div class="n" id="sS">--</div><div class="small muted" id="sSs">sessions done</div></div>
+        <div class="card stat"><p class="eyebrow">Check ins</p><div class="n" id="sC">--</div><div class="small muted" id="sCs">logged</div></div>
+        <div class="card stat"><p class="eyebrow">Next payment</p><div class="n" id="sP">--</div><div class="small muted" id="sPs"></div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><h3>Progress</h3><p class="small muted" style="margin:0 0 8px">Weight over time</p><div id="hChart"></div></div>
+        <div class="card"><h3>From your coach</h3><div id="hNote"></div><button class="btn sm g" data-go="messages" style="margin-top:10px">Open messages</button></div>
+      </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="sec" data-view="progress" hidden>
+      <div class="sec-h"><h2 class="disp">Progress<span class="dot">.</span></h2><button class="btn" id="ciOpen">New check in</button></div>
+      <form class="card grid" id="ciForm" hidden>
+        <h3>Weekly check in</h3>
+        <div class="grid g3">
+          <div class="field"><label for="ciDay">Date</label><input id="ciDay" type="date"></div>
+          <div class="field"><label for="ciW">Weight (lbs)</label><input id="ciW" type="number" step="0.1" inputmode="decimal"></div>
+          <div class="field"><label for="ciBf">Body fat % (optional)</label><input id="ciBf" type="number" step="0.1" inputmode="decimal"></div>
+          <div class="field"><label for="ciWa">Waist inches (optional)</label><input id="ciWa" type="number" step="0.1" inputmode="decimal"></div>
+          <div class="field"><label for="ciE">Energy 1 to 10</label><input id="ciE" type="number" min="1" max="10" inputmode="numeric"></div>
+          <div class="field"><label for="ciSl">Sleep 1 to 10</label><input id="ciSl" type="number" min="1" max="10" inputmode="numeric"></div>
+        </div>
+        <div class="grid g2"><div class="field"><label for="ciWin">Wins this week</label><textarea id="ciWin"></textarea></div><div class="field"><label for="ciStr">What was hard</label><textarea id="ciStr"></textarea></div></div>
+        <p class="err" id="ciErr" role="alert"></p>
+        <div class="row"><button class="btn" type="submit">Save check in</button><button class="btn g" type="button" id="ciCancel">Cancel</button></div>
+      </form>
+      <div class="card"><div class="sec-h"><div><h3>Weight</h3><div id="pChg"></div></div></div><div id="pChart" style="margin-top:10px"></div></div>
+      <div class="card"><h3>Progress photos</h3><p class="small muted" style="margin:0 0 12px">Only you and your coach can see these.</p>
+        <div class="row" style="margin-bottom:12px"><label class="btn sm g" for="phFile" style="cursor:pointer">Add a photo</label><input id="phFile" type="file" accept="image/*" hidden><select id="phLabel" class="seg" style="height:38px;padding:0 12px;color:#fff"><option>Front</option><option>Side</option><option>Back</option></select></div>
+        <div class="photos" id="phGrid"></div></div>
+      <div class="card"><h3>Check in history</h3><div class="list" id="ciList"></div></div>
+    </section>
+
+    <!-- TRAINING -->
+    <section class="sec" data-view="training" hidden>
+      <div class="sec-h"><div><h2 class="disp">Training<span class="dot">.</span></h2><p class="muted" id="tRhythm" style="margin:6px 0 0"></p></div><button class="btn g" id="tAddBtn">Log a session</button></div>
+      <form class="card grid" id="tForm" hidden><h3>Log a session</h3><div class="grid g2"><div class="field"><label for="tDay">Date</label><input id="tDay" type="date"></div><div class="field"><label for="tTitle">What you did</label><input id="tTitle" placeholder="Full body, run, mobility..."></div></div><div class="field"><label for="tLog">Notes</label><textarea id="tLog" placeholder="Weights, reps, how it felt"></textarea></div><div class="row"><button class="btn" type="submit">Save</button><button class="btn g" type="button" id="tCancel">Cancel</button></div></form>
+      <div class="card"><h3>This week</h3><div class="list" id="tWeek"></div></div>
+      <div class="card"><h3>Coming up</h3><div class="list" id="tNext"></div></div>
+      <div class="card"><h3>Done</h3><div class="list" id="tDone"></div></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="sec" data-view="messages" hidden>
+      <div class="sec-h"><h2 class="disp">Your coach<span class="dot">.</span></h2></div>
+      <div class="card"><div class="thread" id="thread"></div>
+        <form id="msgForm" class="row" style="margin-top:12px;flex-wrap:nowrap"><label class="sr" for="msgIn" style="position:absolute;left:-9999px">Message</label><input id="msgIn" placeholder="Message David" style="flex:1;min-width:0;background:var(--ink3);border:1.5px solid #34343a;border-radius:999px;padding:12px 16px;font-size:16px;outline:0"><button class="btn" type="submit">Send</button></form></div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section class="sec" data-view="payments" hidden>
+      <div class="sec-h"><h2 class="disp">Payments<span class="dot">.</span></h2></div>
+      <div class="grid g3"><div class="card stat"><p class="eyebrow">Membership</p><div class="n" id="pyM" style="font-size:38px">--</div><div class="small muted" id="pyMs"></div></div><div class="card stat"><p class="eyebrow">Due now</p><div class="n" id="pyD">--</div></div><div class="card stat"><p class="eyebrow">Paid to date</p><div class="n" id="pyP">--</div></div></div>
+      <div class="card"><h3>History</h3><div class="list" id="pyList"></div><p class="small muted" style="margin:14px 0 0">Questions about a payment? Message your coach. Payments are recorded by Omni when they come in.</p></div>
+    </section>
+  </div></main>
+  <nav class="dock" aria-label="Portal">
+    <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v8a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z"/></svg>Home</button>
+    <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Progress</button>
+    <button data-tab="training"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Train</button>
+    <button data-tab="messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>Coach</button>
+    <button data-tab="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18v12H3zM3 10h18M7 15h3"/></svg>Pay</button>
+  </nav>
+</div>
+
+<!-- account sheet -->
+<div class="drawer" id="meSheet" hidden><div class="panel" style="max-width:520px"><div class="ph"><b style="flex:1;font-size:18px">Your account</b><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  <form class="pb" id="meForm"><div class="field"><label for="mName">Name</label><input id="mName" autocomplete="name"></div><div class="field"><label for="mPhone">Phone</label><input id="mPhone" type="tel" autocomplete="tel"></div><div class="field"><label for="mGoal">Main goal</label><input id="mGoal"></div><div class="field"><label for="mGw">Goal weight (lbs)</label><input id="mGw" type="number" step="0.1" inputmode="decimal"></div>
+  <div class="row"><button class="btn" type="submit">Save</button><button class="btn g" type="button" id="signOut">Sign out</button></div>
+  <p class="small muted">Install the app: on iPhone tap Share, then Add to Home Screen. On Android tap the menu, then Install app.</p></form></div></div>
+
+<script src="/assets/omni-app.js"></script>
+<script>
+(function(){var O=Omni,$=O.$,$$=O.$$,api=O.api;var ME=null,UID=null,D={};
+if(O.demo)$('#demoBar').hidden=false;
+
+/* ---------- auth ---------- */
+var mode='in';
+$$('[data-mode]').forEach(function(b){b.onclick=function(){mode=b.dataset.mode;$$('[data-mode]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});$$('[data-up]').forEach(function(f){f.hidden=mode!=='up'});$('#aBtn').textContent=mode==='up'?'Create my account':'Sign in';$('#aPw').autocomplete=mode==='up'?'new-password':'current-password';$('#aErr').textContent=''}});
+$('#authForm').onsubmit=async function(e){e.preventDefault();var em=$('#aEmail').value.trim(),pw=$('#aPw').value,err=$('#aErr');err.textContent='';
+  if(!/^\S+@\S+\.\S+$/.test(em)){err.textContent='Enter a valid email.';return}if(pw.length<8){err.textContent='Use at least 8 characters for your password.';return}
+  if(mode==='up'&&!$('#aName').value.trim()){err.textContent='Add your name.';return}
+  var b=$('#aBtn');b.disabled=true;b.textContent='One sec...';
+  try{if(mode==='up')await api.signUp(em,pw,{full_name:$('#aName').value.trim(),path:$('#aPath').value,goal:$('#aGoal').value.trim()});else await api.signIn(em,pw);await boot()}
+  catch(x){err.textContent=/Invalid login/i.test(x.message)?'That email and password do not match.':/already registered/i.test(x.message)?'That email already has an account. Sign in instead.':x.message}
+  b.disabled=false;b.textContent=mode==='up'?'Create my account':'Sign in'};
+
+/* ---------- tabs ---------- */
+var TAB='home';
+function show(t){TAB=t;$$('[data-view]').forEach(function(v){v.hidden=v.dataset.view!==t});$$('[data-tab]').forEach(function(b){b.setAttribute('aria-current',String(b.dataset.tab===t))});window.scrollTo(0,0);if(t==='messages'){var th=$('#thread');th.scrollTop=th.scrollHeight}}
+$$('[data-tab]').forEach(function(b){b.onclick=function(){show(b.dataset.tab)}});
+$$('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go);if(b.hasAttribute('data-open-checkin'))openCI()})});
+
+/* ---------- load ---------- */
+async function load(){var r=await Promise.all([api.list('checkins',UID),api.list('sessions',UID),api.list('notes',UID),api.list('payments',UID),api.list('photos',UID)]);D={checkins:r[0],sessions:r[1],notes:r[2],payments:r[3],photos:r[4]};render()}
+function render(){var p=ME,t=O.today(),wk=O.weekRange();var first=(p.full_name||'').split(' ')[0]||'there';
+  $('#meInit').textContent=O.initials(p.full_name||p.email);
+  $('#hHello').innerHTML='Hey '+O.esc(first)+'<span class="dot">.</span>';
+  $('#hPlan').textContent=[p.path==='performance'?'Omni Performance':'Omni Health',p.membership,p.rhythm].filter(Boolean).join(' · ')||'Your plan';
+  $('#hGoal').textContent=p.goal?('Goal: '+p.goal):'Your coach sets up your plan after your consult. Log your first check in to get started.';
+  var tr=O.weightTrend(D.checkins,p),down=p.goal_weight!=null&&p.start_weight!=null?+p.goal_weight<+p.start_weight:true;
+  $('#sW').innerHTML=tr.last!=null?tr.last+'<small>lbs</small>':'--';$('#sWc').innerHTML=O.chgHtml(tr.change,down);
+  var thisWeek=D.sessions.filter(function(s){return s.day>=wk[0]&&s.day<=wk[1]});
+  $('#sS').textContent=thisWeek.filter(function(s){return s.done}).length+' / '+thisWeek.length;
+  $('#sC').textContent=D.checkins.length;var lastCi=D.checkins.slice().sort(function(a,b){return a.day<b.day?1:-1})[0];$('#sCs').textContent=lastCi?'last on '+O.fdate(lastCi.day):'none yet';
+  var open=D.payments.filter(function(x){return !x.paid_on}).sort(function(a,b){return (a.due_date||'')<(b.due_date||'')?-1:1})[0];
+  $('#sP').textContent=open?O.money(open.amount_cents):'$0';$('#sPs').innerHTML=open?(O.payStatus(open)==='late'?'<span class="pill late">Past due</span> ':'')+'due '+O.fdate(open.due_date):'all caught up';
+  var ch=O.chart(tr.points,{goal:p.goal_weight!=null?+p.goal_weight:null});$('#hChart').innerHTML=ch;$('#pChart').innerHTML=ch;$('#pChg').innerHTML=O.chgHtml(tr.change,down);
+  var cn=D.notes.filter(function(n){return n.author_id!==UID}).slice(-1)[0];$('#hNote').innerHTML=cn?'<p style="margin:6px 0 0;font-size:17px">'+O.esc(cn.body)+'</p><p class="small muted" style="margin:6px 0 0">'+O.ftime(cn.created_at)+'</p>':'<p class="empty">Messages from your coach show up here.</p>';
+  // checkins
+  var cl=D.checkins.slice().sort(function(a,b){return a.day<b.day?1:-1});
+  $('#ciList').innerHTML=cl.length?cl.map(function(c){var bits=[c.weight!=null?c.weight+' lbs':null,c.body_fat!=null?c.body_fat+'% bf':null,c.waist!=null?c.waist+' in waist':null,c.energy?'energy '+c.energy:null,c.sleep?'sleep '+c.sleep:null].filter(Boolean).join(' · ');return '<div class="li"><div class="main"><b>'+O.fdate(c.day,{weekday:'short',month:'short',day:'numeric'})+'</b><span>'+O.esc(bits)+'</span>'+(c.wins?'<span>Win: '+O.esc(c.wins)+'</span>':'')+(c.struggles?'<span>Hard: '+O.esc(c.struggles)+'</span>':'')+'</div></div>'}).join(''):'<p class="empty">No check ins yet. Your first one sets your starting point.</p>';
+  // training
+  $('#tRhythm').textContent=p.rhythm?('Omni '+p.rhythm+' · '+(O.RHYTHMS[p.rhythm]||'')):'Your coach adds your sessions here.';
+  function sRow(s){return '<div class="li"><button class="check'+(s.done?' on':'')+'" data-done="'+s.id+'" aria-label="'+(s.done?'Mark not done':'Mark done')+': '+O.esc(s.title)+'"></button><div class="main"><b>'+O.esc(s.title)+'</b><span>'+O.fdate(s.day,{weekday:'short',month:'short',day:'numeric'})+(s.details?' · '+O.esc(s.details):'')+'</span>'+(s.client_log?'<span>You: '+O.esc(s.client_log)+'</span>':'')+'</div></div>'}
+  $('#tWeek').innerHTML=thisWeek.length?thisWeek.map(sRow).join(''):'<p class="empty">Nothing on the plan this week yet.</p>';
+  var nxt=D.sessions.filter(function(s){return s.day>wk[1]});$('#tNext').innerHTML=nxt.length?nxt.map(sRow).join(''):'<p class="empty">Your coach posts upcoming sessions here.</p>';
+  var dn=D.sessions.filter(function(s){return s.day<wk[0]}).reverse();$('#tDone').innerHTML=dn.length?dn.slice(0,20).map(sRow).join(''):'<p class="empty">Finished sessions land here.</p>';
+  $$('[data-done]').forEach(function(b){b.onclick=async function(){var s=D.sessions.find(function(x){return x.id===b.dataset.done});var log=s.client_log;if(!s.done){log=prompt('How did it go? (optional)',s.client_log||'');if(log===null)return}try{await api.update('sessions',s.id,{done:!s.done,client_log:log||null});s.done=!s.done;s.client_log=log||null;render();O.toast(s.done?'Nice work. Session logged.':'Marked not done')}catch(x){O.toast(x.message)}}});
+  // messages
+  $('#thread').innerHTML=D.notes.length?D.notes.map(function(n){var mine=n.author_id===UID;return '<div class="msg '+(mine?'me':'them')+'">'+O.esc(n.body)+'<small>'+(mine?'You':'Coach')+' · '+O.ftime(n.created_at)+'</small></div>'}).join(''):'<p class="empty">Say hi to your coach. Questions, wins, how a session felt, anything.</p>';
+  // payments
+  $('#pyM').textContent=p.membership||'--';$('#pyMs').textContent=p.membership&&O.PLANS[p.membership]?O.money(O.PLANS[p.membership])+' a month':'Set after your consult';
+  var due=D.payments.filter(function(x){return !x.paid_on}).reduce(function(a,x){return a+x.amount_cents},0),paid=D.payments.filter(function(x){return x.paid_on}).reduce(function(a,x){return a+x.amount_cents},0);
+  $('#pyD').textContent=O.money(due);$('#pyP').textContent=O.money(paid);
+  $('#pyList').innerHTML=D.payments.length?D.payments.map(function(x){var st=O.payStatus(x);return '<div class="li"><div class="main"><b>'+O.esc(x.label)+'</b><span>'+(x.paid_on?'Paid '+O.fdate(x.paid_on)+(x.method?' by '+O.esc(x.method):''):'Due '+O.fdate(x.due_date))+'</span></div><b>'+O.money(x.amount_cents)+'</b><span class="pill '+st+'">'+O.payLabel[st]+'</span></div>'}).join(''):'<p class="empty">No payments yet.</p>';
+  photos();
+}
+async function photos(){var urls=await api.photoUrls(D.photos);$('#phGrid').innerHTML=D.photos.length?D.photos.map(function(ph,i){return '<figure><img src="'+O.esc(urls[i])+'" alt="Progress photo, '+O.esc(ph.label||'')+' '+O.fdate(ph.taken_on)+'" loading="lazy"><figcaption>'+O.esc((ph.label?ph.label+' · ':'')+O.fdate(ph.taken_on))+'</figcaption></figure>'}).join(''):'<p class="empty">No photos yet. Front, side and back every 4 weeks works great.</p>'}
+
+/* ---------- forms ---------- */
+function openCI(){var f=$('#ciForm');f.hidden=false;$('#ciDay').value=O.today();$('#ciW').focus()}
+$('#ciOpen').onclick=openCI;$('#ciCancel').onclick=function(){$('#ciForm').hidden=true};
+$('#ciForm').onsubmit=async function(e){e.preventDefault();var n=function(id){var v=$(id).value;return v===''?null:+v};var row={client_id:UID,day:$('#ciDay').value||O.today(),weight:n('#ciW'),body_fat:n('#ciBf'),waist:n('#ciWa'),energy:n('#ciE'),sleep:n('#ciSl'),wins:$('#ciWin').value.trim()||null,struggles:$('#ciStr').value.trim()||null};
+  if(row.weight==null&&!row.wins&&!row.struggles){$('#ciErr').textContent='Add at least your weight or a note.';return}
+  if((row.energy&&(row.energy<1||row.energy>10))||(row.sleep&&(row.sleep<1||row.sleep>10))){$('#ciErr').textContent='Energy and sleep go from 1 to 10.';return}
+  try{var saved=await api.insert('checkins',row);D.checkins.push(saved);if(ME.start_weight==null&&row.weight!=null){await api.updateProfile(UID,{start_weight:row.weight});ME.start_weight=row.weight}$('#ciForm').reset();$('#ciForm').hidden=true;$('#ciErr').textContent='';render();O.toast('Check in saved')}catch(x){$('#ciErr').textContent=x.message}};
+$('#phFile').onchange=async function(){var f=this.files[0];if(!f)return;if(f.size>12e6){O.toast('That photo is too big. Under 12 MB please.');return}O.toast('Uploading...');try{var r=await api.uploadPhoto(UID,f,$('#phLabel').value);D.photos.unshift(r);photos();O.toast('Photo added')}catch(x){O.toast(x.message)}this.value=''};
+$('#tAddBtn').onclick=function(){$('#tForm').hidden=false;$('#tDay').value=O.today();$('#tTitle').focus()};$('#tCancel').onclick=function(){$('#tForm').hidden=true};
+$('#tForm').onsubmit=async function(e){e.preventDefault();var title=$('#tTitle').value.trim();if(!title){O.toast('Add what you did');return}try{var s=await api.insert('sessions',{client_id:UID,day:$('#tDay').value||O.today(),title:title,done:true,client_log:$('#tLog').value.trim()||null});D.sessions.push(s);D.sessions.sort(function(a,b){return a.day<b.day?-1:1});$('#tForm').reset();$('#tForm').hidden=true;render();O.toast('Session logged')}catch(x){O.toast(x.message)}};
+$('#msgForm').onsubmit=async function(e){e.preventDefault();var v=$('#msgIn').value.trim();if(!v)return;try{var n=await api.insert('notes',{client_id:UID,author_id:UID,body:v});D.notes.push(n);$('#msgIn').value='';render();var th=$('#thread');th.scrollTop=th.scrollHeight}catch(x){O.toast(x.message)}};
+$('#meBtn').onclick=function(){$('#mName').value=ME.full_name||'';$('#mPhone').value=ME.phone||'';$('#mGoal').value=ME.goal||'';$('#mGw').value=ME.goal_weight==null?'':ME.goal_weight;$('#meSheet').hidden=false};
+$$('#meSheet [data-close]').forEach(function(b){b.onclick=function(){$('#meSheet').hidden=true}});$('#meSheet').addEventListener('click',function(e){if(e.target.id==='meSheet')e.currentTarget.hidden=true});
+$('#meForm').onsubmit=async function(e){e.preventDefault();var gw=$('#mGw').value;var patch={full_name:$('#mName').value.trim()||null,phone:$('#mPhone').value.trim()||null,goal:$('#mGoal').value.trim()||null,goal_weight:gw===''?null:+gw};try{await api.updateProfile(UID,patch);Object.assign(ME,patch);render();$('#meSheet').hidden=true;O.toast('Saved')}catch(x){O.toast(x.message)}};
+$('#signOut').onclick=function(){api.signOut()};
+
+/* ---------- boot ---------- */
+async function boot(){try{var u=await api.session();if(!u){$('#auth').hidden=false;$('#app').hidden=true;return}
+  UID=u.id;O._me=UID;ME=await api.profile(UID);
+  if(!ME){if(!O.demo){await O.client().from('omni_profiles').insert({id:UID,email:u.email,full_name:(u.user_metadata||{}).full_name||null}).then(function(){});ME=await api.profile(UID)}}
+  if(!ME){$('#auth').hidden=false;$('#aErr').textContent='Your account is not set up for Omni yet. Message David.';return}
+  if(ME.role==='coach'&&!O.demo){location.href='/studio/';return}
+  $('#auth').hidden=true;$('#app').hidden=false;O.hud($('.mon'));show(TAB);await load()}
+  catch(x){$('#auth').hidden=false;$('#aErr').textContent=x.message}}
+boot();
+if('serviceWorker' in navigator&&!O.demo){navigator.serviceWorker.register('/portal/sw.js').catch(function(){})}
+})();
+</script>
+</body>
+</html>
