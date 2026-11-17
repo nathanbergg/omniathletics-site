@@ -49,13 +49,8 @@ a{color:inherit}
 .chg{font-family:var(--mono);font-size:12px;letter-spacing:.04em}
 .chg.down{color:var(--green)}.chg.up{color:var(--amber)}
 
-/* monitor HUD (Suubi edit bay touch) */
-.mon{position:relative;border-radius:28px;background:radial-gradient(120% 120% at 0% 0%,#22070a 0%,#111113 55%);border:1px solid #3a1416;padding:52px 22px 22px;overflow:hidden}
-.mon::before,.mon::after,.mon>i::before,.mon>i::after{content:"";position:absolute;width:22px;height:22px;border:2px solid rgba(255,255,255,.85)}
-.mon::before{top:10px;left:10px;border-right:0;border-bottom:0;border-radius:12px 0 0 0}
-.mon::after{top:10px;right:10px;border-left:0;border-bottom:0;border-radius:0 12px 0 0}
-.mon>i::before{bottom:10px;left:10px;border-right:0;border-top:0;border-radius:0 0 0 12px}
-.mon>i::after{bottom:10px;right:10px;border-left:0;border-top:0;border-radius:0 0 12px 0}
+/* hero card */
+.mon{position:relative;border-radius:28px;background:radial-gradient(120% 120% at 0% 0%,#22070a 0%,#111113 55%);border:1px solid #3a1416;padding:26px 22px 24px;overflow:hidden}
 .hud{position:absolute;top:18px;left:42px;right:42px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8)}
 .hud b{display:inline-flex;align-items:center;gap:7px;font-weight:500}
 .hud b::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1.4s steps(2) infinite}
