@@ -39,7 +39,6 @@
   </div></header>
   <main><div class="wrap sec">
     <div class="mon" style="container-type:inline-size"><i></i>
-      <div class="hud" aria-hidden="true"><b data-rec>REC 00:00:00:00</b><span><span class="city">Bellingham </span><span data-clock></span></span></div>
       <p class="eyebrow" id="today"></p>
       <h1 class="disp" style="font-size:clamp(52px,10vw,92px);margin-top:6px">Your roster<span class="dot">.</span></h1>
       <p class="muted" style="margin:8px 0 0">Every client, their numbers and what they owe, in one place.</p>
@@ -170,7 +169,7 @@ $('#plForm').onsubmit=async function(e){e.preventDefault();var n=function(id){va
 
 async function boot(){try{var u=await api.session(true);if(!u){$('#auth').hidden=false;return}ME=await api.profile(u.id);O._me=u.id;
   if(!ME||ME.role!=='coach'){$('#auth').hidden=false;$('#app').hidden=true;$('#aErr').textContent='This account is a client account. Use omniathletics.co/portal.';return}
-  $('#auth').hidden=true;$('#app').hidden=false;O.hud($('.mon'));await loadAll()}catch(x){$('#auth').hidden=false;$('#aErr').textContent=x.message}}
+  $('#auth').hidden=true;$('#app').hidden=false;await loadAll()}catch(x){$('#auth').hidden=false;$('#aErr').textContent=x.message}}
 boot();
 })();
 </script>
