@@ -57,7 +57,6 @@
     <!-- HOME -->
     <section class="sec" data-view="home">
       <div class="mon" style="container-type:inline-size"><i></i>
-        <div class="hud" aria-hidden="true"><b data-rec>REC 00:00:00:00</b><span><span class="city">Bellingham </span><span data-clock></span></span></div>
         <p class="eyebrow" id="hPlan">Your plan</p>
         <h1 class="disp" style="font-size:clamp(52px,11vw,96px);margin-top:6px" id="hHello">Welcome<span class="dot">.</span></h1>
         <p class="muted" id="hGoal" style="margin:8px 0 18px;max-width:34em"></p>
@@ -218,7 +217,7 @@ async function boot(){try{var u=await api.session();if(!u){$('#auth').hidden=fal
   if(!ME){if(!O.demo){await O.client().from('omni_profiles').insert({id:UID,email:u.email,full_name:(u.user_metadata||{}).full_name||null}).then(function(){});ME=await api.profile(UID)}}
   if(!ME){$('#auth').hidden=false;$('#aErr').textContent='Your account is not set up for Omni yet. Message David.';return}
   if(ME.role==='coach'&&!O.demo){location.href='/studio/';return}
-  $('#auth').hidden=true;$('#app').hidden=false;O.hud($('.mon'));show(TAB);await load()}
+  $('#auth').hidden=true;$('#app').hidden=false;show(TAB);await load()}
   catch(x){$('#auth').hidden=false;$('#aErr').textContent=x.message}}
 boot();
 if('serviceWorker' in navigator&&!O.demo){navigator.serviceWorker.register('/portal/sw.js').catch(function(){})}
